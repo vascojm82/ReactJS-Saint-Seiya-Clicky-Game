@@ -1,7 +1,6 @@
 let React = require('react');
 let VideoBackground = require('./VideoBackground.jsx');
 let Card = require('./Card.jsx');
-let helpers = require('../helpers/helpers');
 let Json = require('circular-json');
 
 let CardBox = React.createClass({

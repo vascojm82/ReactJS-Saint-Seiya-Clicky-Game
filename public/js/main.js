@@ -21288,7 +21288,7 @@ let App = React.createClass({
 
 module.exports = App;
 
-},{"../helpers/jukebox.js":195,"./CardBox.jsx":188,"./Footer.jsx":189,"./Hero.jsx":190,"./Modal.jsx":191,"./Navbar.jsx":192,"circular-json":1,"react":185,"react-dom":32,"react-favicon":159}],187:[function(require,module,exports){
+},{"../helpers/jukebox.js":194,"./CardBox.jsx":188,"./Footer.jsx":189,"./Hero.jsx":190,"./Modal.jsx":191,"./Navbar.jsx":192,"circular-json":1,"react":185,"react-dom":32,"react-favicon":159}],187:[function(require,module,exports){
 let React = require('react');
 
 let Card = React.createClass({
@@ -21321,7 +21321,6 @@ module.exports = Card;
 let React = require('react');
 let VideoBackground = require('./VideoBackground.jsx');
 let Card = require('./Card.jsx');
-let helpers = require('../helpers/helpers');
 let Json = require('circular-json');
 
 let CardBox = React.createClass({
@@ -21410,7 +21409,7 @@ let CardBox = React.createClass({
 
 module.exports = CardBox;
 
-},{"../helpers/helpers":194,"./Card.jsx":187,"./VideoBackground.jsx":193,"circular-json":1,"react":185}],189:[function(require,module,exports){
+},{"./Card.jsx":187,"./VideoBackground.jsx":193,"circular-json":1,"react":185}],189:[function(require,module,exports){
 let React = require('react');
 
 let Footer = React.createClass({
@@ -21638,11 +21637,6 @@ let VideoBackground = React.createClass({
 module.exports = VideoBackground;
 
 },{"react":185}],194:[function(require,module,exports){
-
-
-module.exports = {};
-
-},{}],195:[function(require,module,exports){
 let initializeJukebox = function () {
   return new Promise((resolve, reject) => {
     $(document).ready(function () {
@@ -21713,11 +21707,11 @@ module.exports = {
   initializeJukebox
 };
 
-},{}],196:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 let React = require('react');
 let ReactDOM = require('react-dom');
 let App = require('./components/App.jsx');
 
 ReactDOM.render(React.createElement(App, null), document.getElementById('main'));
 
-},{"./components/App.jsx":186,"react":185,"react-dom":32}]},{},[196]);
+},{"./components/App.jsx":186,"react":185,"react-dom":32}]},{},[195]);
