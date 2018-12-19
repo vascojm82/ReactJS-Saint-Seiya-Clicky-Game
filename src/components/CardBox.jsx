@@ -1,11 +1,12 @@
 let React = require('react');
 let VideoBackground = require('./VideoBackground.jsx');
 let Card = require('./Card.jsx');
+let helpers = require('../helpers/helpers');
 let Json = require('circular-json');
 
 let CardBox = React.createClass({
   getInitialState: function() {
-    return { cardList: [], currentCard: '' };
+    return { cardList: [], currentCard: '', prevCard: '' };
   },
   getRandomArray: function(min,max){
     var A= [];
@@ -14,30 +15,33 @@ let CardBox = React.createClass({
     return A;
   },
   getCardState: function(selectedCard){
-    if(this.state.currentCard >= 0){
-      if(this.state.currentCard === selectedCard){
+    if(this.state.currentCard === ''){
+      this.props.playMusic('selectSound', this.props.soundCollection);
+      console.log(`First Time EVER!!`);
+      this.props.computeScore(false);
+      this.setState({
+        currentCard: selectedCard,
+        prevCard: this.state.currentCard
+      });
+    }else if(this.state.currentCard >= 0){
+      if(this.state.currentCard === selectedCard || this.state.prevCard === selectedCard){
         console.log("this.state.currentCard: ",this.state.currentCard);
+        this.props.playMusic('wrongSound', this.props.soundCollection);
+        this.props.computeScore(true);
         this.generateCardList()
           .then(function(list){
             this.setState({
               cardList: list
-            }, function(){
-              console.log("New Card List: ",this.state.cardList);
             });
           }.bind(this));
       }else{
+        this.props.playMusic('selectSound', this.props.soundCollection);
+        this.props.computeScore(false);
         this.setState({
-          currentCard: selectedCard
-        },function(){
-          console.log("New card: ",this.state.currentCard);
+          currentCard: selectedCard,
+          prevCard: this.state.currentCard
         });
       }
-    }else{
-      this.setState({
-        currentCard: selectedCard
-      },function(){
-        console.log("First card: ",this.state.currentCard);
-      });
     }
   },
   generateCardList: function(){
@@ -46,9 +50,9 @@ let CardBox = React.createClass({
       console.log("Img Array: ", imgOrderArray);
       let list = [];
 
-      imgOrderArray.forEach((index, cardNum) => {   //Had to make it an arrow func. instead of a regular one, as reference to 'this' had been
+      imgOrderArray.forEach((cardNum, index) => {   //Had to make it an arrow func. instead of a regular one, as reference to 'this' had been
         console.log("cardNum: ",cardNum);           //lost inside. It was pointing to 'cardNum' instead of the component itself so this.props was
-        list.push(<Card getCardState={this.getCardState} playSound={this.props.playMusic} soundCollection={this.props.soundCollection} cardNum={cardNum} />);   //showing up as 'undefined'
+        list.push(<Card getCardState={this.getCardState} selected={false} playSound={this.props.playMusic} soundCollection={this.props.soundCollection} cardNum={cardNum} />);   //showing up as 'undefined'
       });
 
       if(list.length > 0)

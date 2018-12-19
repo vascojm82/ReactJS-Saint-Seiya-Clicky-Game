@@ -2,7 +2,7 @@ let React = require('react');
 
 let Navbar = React.createClass({
   getInitialState: function(){     //called only once when the component loads
-    return {score: parseInt(this.props.score), topScore: parseInt(this.props.scoreScore)};
+    return {score: 0, topScore: 0};
   },
   render: function(){
     return(

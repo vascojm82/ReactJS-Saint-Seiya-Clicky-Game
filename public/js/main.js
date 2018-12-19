@@ -21231,16 +21231,39 @@ let App = React.createClass({
 
   getInitialState: function () {
     //called only once when the component loads
-    return { cardBox: '', modal: '' };
+    return { cardBox: '', modal: '', score: 0, topScore: 0 };
   },
   toggleModal: function () {
     $(ReactDOM.findDOMNode(this.refs.modal)).modal();
+  },
+  computeScore: function (hasBeenSelected) {
+    if (hasBeenSelected) {
+      console.log("Re-start! ---App.computeScore--");
+      this.setState({
+        topScore: this.state.score,
+        score: 0
+      }, function () {
+        console.log(`score: ${this.state.score} | topScore: ${this.state.topScore}`);
+        console.log(`this.refs.nav.state: `, this.refs.nav.state);
+        this.refs.nav.state.score = this.state.score;
+        this.refs.nav.state.topScore = this.state.topScore;
+      });
+    } else {
+      console.log("Kontinue! ---App.computeScore--");
+      this.setState({
+        score: this.state.score + 1
+      }, function () {
+        console.log(`score: ${this.state.score} | topScore: ${this.state.topScore}`);
+        console.log(`this.refs.nav.state: `, this.refs.nav.state);
+        this.refs.nav.state.score = this.state.score;
+      });
+    }
   },
   componentDidMount: function () {
     MusicPlayer.initializeJukebox() //Promesified the 'MusicPlayer' (Jukebox) to force synchronicity.
     .then(function (jukebox) {
       this.setState({
-        cardBox: React.createElement(CardBox, { playMusic: jukebox.musicPlayer, soundCollection: jukebox.collection }),
+        cardBox: React.createElement(CardBox, { computeScore: this.computeScore, playMusic: jukebox.musicPlayer, soundCollection: jukebox.collection }),
         modal: React.createElement(Modal, { playMusic: jukebox.musicPlayer, soundCollection: jukebox.collection, title: 'Welcome to my Clicky Game App', subtitle1: 'Click on an image to earn points,', subtitle2: 'but don\'t click on any more than once!', ref: function (ref) {
             this.refs.modal = ref;
           }.bind(this) })
@@ -21254,7 +21277,7 @@ let App = React.createClass({
       'div',
       { 'class': 'container-fluid' },
       React.createElement(Favicon, { url: './../public/img/favicon.ico' }),
-      React.createElement(Navbar, { title: 'Clicky Game', subtitle: 'Click an image to begin!', score: '0', topScore: '0' }),
+      React.createElement(Navbar, { score: this.state.score, topScore: this.state.topScore, title: 'Clicky Game', subtitle: 'Click an image to begin!', ref: 'nav' }),
       React.createElement(Hero, { title: 'Clicky Game!', subtitle: 'Click on an image to earn points, but ONLY once!' }),
       this.state.cardBox,
       this.state.modal,
@@ -21265,18 +21288,17 @@ let App = React.createClass({
 
 module.exports = App;
 
-},{"../helpers/jukebox.js":194,"./CardBox.jsx":188,"./Footer.jsx":189,"./Hero.jsx":190,"./Modal.jsx":191,"./Navbar.jsx":192,"circular-json":1,"react":185,"react-dom":32,"react-favicon":159}],187:[function(require,module,exports){
+},{"../helpers/jukebox.js":195,"./CardBox.jsx":188,"./Footer.jsx":189,"./Hero.jsx":190,"./Modal.jsx":191,"./Navbar.jsx":192,"circular-json":1,"react":185,"react-dom":32,"react-favicon":159}],187:[function(require,module,exports){
 let React = require('react');
 
 let Card = React.createClass({
   displayName: 'Card',
 
-  onMouseOver: function () {
+  onMouseOver: function (e) {
     console.log("this --- Card ---", this);
     this.props.playSound('hoverSound', this.props.soundCollection);
   },
   onClick: function (e) {
-    this.props.playSound('selectSound', this.props.soundCollection);
     this.props.getCardState(this.props.cardNum);
   },
   render: function () {
@@ -21299,13 +21321,14 @@ module.exports = Card;
 let React = require('react');
 let VideoBackground = require('./VideoBackground.jsx');
 let Card = require('./Card.jsx');
+let helpers = require('../helpers/helpers');
 let Json = require('circular-json');
 
 let CardBox = React.createClass({
   displayName: 'CardBox',
 
   getInitialState: function () {
-    return { cardList: [], currentCard: '' };
+    return { cardList: [], currentCard: '', prevCard: '' };
   },
   getRandomArray: function (min, max) {
     var A = [];
@@ -21316,29 +21339,32 @@ let CardBox = React.createClass({
     return A;
   },
   getCardState: function (selectedCard) {
-    if (this.state.currentCard >= 0) {
-      if (this.state.currentCard === selectedCard) {
+    if (this.state.currentCard === '') {
+      this.props.playMusic('selectSound', this.props.soundCollection);
+      console.log(`First Time EVER!!`);
+      this.props.computeScore(false);
+      this.setState({
+        currentCard: selectedCard,
+        prevCard: this.state.currentCard
+      });
+    } else if (this.state.currentCard >= 0) {
+      if (this.state.currentCard === selectedCard || this.state.prevCard === selectedCard) {
         console.log("this.state.currentCard: ", this.state.currentCard);
+        this.props.playMusic('wrongSound', this.props.soundCollection);
+        this.props.computeScore(true);
         this.generateCardList().then(function (list) {
           this.setState({
             cardList: list
-          }, function () {
-            console.log("New Card List: ", this.state.cardList);
           });
         }.bind(this));
       } else {
+        this.props.playMusic('selectSound', this.props.soundCollection);
+        this.props.computeScore(false);
         this.setState({
-          currentCard: selectedCard
-        }, function () {
-          console.log("New card: ", this.state.currentCard);
+          currentCard: selectedCard,
+          prevCard: this.state.currentCard
         });
       }
-    } else {
-      this.setState({
-        currentCard: selectedCard
-      }, function () {
-        console.log("First card: ", this.state.currentCard);
-      });
     }
   },
   generateCardList: function () {
@@ -21347,10 +21373,10 @@ let CardBox = React.createClass({
       console.log("Img Array: ", imgOrderArray);
       let list = [];
 
-      imgOrderArray.forEach((index, cardNum) => {
+      imgOrderArray.forEach((cardNum, index) => {
         //Had to make it an arrow func. instead of a regular one, as reference to 'this' had been
         console.log("cardNum: ", cardNum); //lost inside. It was pointing to 'cardNum' instead of the component itself so this.props was
-        list.push(React.createElement(Card, { getCardState: this.getCardState, playSound: this.props.playMusic, soundCollection: this.props.soundCollection, cardNum: cardNum })); //showing up as 'undefined'
+        list.push(React.createElement(Card, { getCardState: this.getCardState, selected: false, playSound: this.props.playMusic, soundCollection: this.props.soundCollection, cardNum: cardNum })); //showing up as 'undefined'
       });
 
       if (list.length > 0) resolve(list);else reject("Error generating tile list!");
@@ -21384,7 +21410,7 @@ let CardBox = React.createClass({
 
 module.exports = CardBox;
 
-},{"./Card.jsx":187,"./VideoBackground.jsx":193,"circular-json":1,"react":185}],189:[function(require,module,exports){
+},{"../helpers/helpers":194,"./Card.jsx":187,"./VideoBackground.jsx":193,"circular-json":1,"react":185}],189:[function(require,module,exports){
 let React = require('react');
 
 let Footer = React.createClass({
@@ -21540,7 +21566,7 @@ let Navbar = React.createClass({
 
   getInitialState: function () {
     //called only once when the component loads
-    return { score: parseInt(this.props.score), topScore: parseInt(this.props.scoreScore) };
+    return { score: 0, topScore: 0 };
   },
   render: function () {
     return React.createElement(
@@ -21612,6 +21638,11 @@ let VideoBackground = React.createClass({
 module.exports = VideoBackground;
 
 },{"react":185}],194:[function(require,module,exports){
+
+
+module.exports = {};
+
+},{}],195:[function(require,module,exports){
 let initializeJukebox = function () {
   return new Promise((resolve, reject) => {
     $(document).ready(function () {
@@ -21621,19 +21652,19 @@ let initializeJukebox = function () {
         autoPlay: true,
         loops: 100,
         onload: function () {
-          alert('The sound ' + this.id + ' loaded!');
+          //alert('The sound '+this.id+' loaded!');
         }
       });
 
       backgroundMusicObject.stop();
-      backgroundMusicObject.setVolume(20);
+      backgroundMusicObject.setVolume(30);
 
       let hoverSoundObject = soundManager.createSound({
         url: "assets/hover.wav",
         autoLoad: true,
         autoPlay: true,
         onload: function () {
-          alert('The sound ' + this.id + ' loaded!');
+          //alert('The sound '+this.id+' loaded!');
         }
       });
 
@@ -21644,21 +21675,33 @@ let initializeJukebox = function () {
         autoLoad: true,
         autoPlay: true,
         onload: function () {
-          alert('The sound ' + this.id + ' loaded!');
+          //alert('The sound '+this.id+' loaded!');
         }
       });
 
       selectSoundObject.stop();
 
+      let wrongSoundObject = soundManager.createSound({
+        url: "assets/wrong.mp3",
+        autoLoad: true,
+        autoPlay: true,
+        onload: function () {
+          //alert('The sound '+this.id+' loaded!');
+        }
+      });
+
+      wrongSoundObject.stop();
+
       let play = function (choice, soundCollection) {
-        if (choice === 'backgroundMusic') soundCollection.backgroundMusicObject.play();else if (choice === 'hoverSound') soundCollection.hoverSoundObject.play();else if (choice === 'selectSound') soundCollection.selectSoundObject.play();
+        if (choice === 'backgroundMusic') soundCollection.backgroundMusicObject.play();else if (choice === 'hoverSound') soundCollection.hoverSoundObject.play();else if (choice === 'selectSound') soundCollection.selectSoundObject.play();else soundCollection.wrongSoundObject.play();
       };
 
       resolve({
         collection: {
-          backgroundMusicObject: backgroundMusicObject,
-          hoverSoundObject: hoverSoundObject,
-          selectSoundObject: selectSoundObject
+          backgroundMusicObject,
+          hoverSoundObject,
+          selectSoundObject,
+          wrongSoundObject
         },
         musicPlayer: play
       });
@@ -21670,11 +21713,11 @@ module.exports = {
   initializeJukebox
 };
 
-},{}],195:[function(require,module,exports){
+},{}],196:[function(require,module,exports){
 let React = require('react');
 let ReactDOM = require('react-dom');
 let App = require('./components/App.jsx');
 
 ReactDOM.render(React.createElement(App, null), document.getElementById('main'));
 
-},{"./components/App.jsx":186,"react":185,"react-dom":32}]},{},[195]);
+},{"./components/App.jsx":186,"react":185,"react-dom":32}]},{},[196]);

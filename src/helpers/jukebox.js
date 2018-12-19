@@ -7,19 +7,19 @@ let initializeJukebox = function(){
         autoPlay: true,
         loops: 100,
         onload: function() {
-          alert('The sound '+this.id+' loaded!');
+          //alert('The sound '+this.id+' loaded!');
         },
       });
 
       backgroundMusicObject.stop();
-      backgroundMusicObject.setVolume(20);
+      backgroundMusicObject.setVolume(30);
 
       let hoverSoundObject = soundManager.createSound({
         url: "assets/hover.wav",
         autoLoad: true,
         autoPlay: true,
         onload: function() {
-          alert('The sound '+this.id+' loaded!');
+          //alert('The sound '+this.id+' loaded!');
         },
       });
 
@@ -30,11 +30,22 @@ let initializeJukebox = function(){
         autoLoad: true,
         autoPlay: true,
         onload: function() {
-          alert('The sound '+this.id+' loaded!');
+          //alert('The sound '+this.id+' loaded!');
         },
       });
 
       selectSoundObject.stop();
+
+      let wrongSoundObject = soundManager.createSound({
+        url: "assets/wrong.mp3",
+        autoLoad: true,
+        autoPlay: true,
+        onload: function() {
+          //alert('The sound '+this.id+' loaded!');
+        },
+      });
+
+      wrongSoundObject.stop();
 
       let play = function(choice, soundCollection){
         if(choice === 'backgroundMusic')
@@ -43,13 +54,16 @@ let initializeJukebox = function(){
           soundCollection.hoverSoundObject.play();
         else if(choice === 'selectSound')
           soundCollection.selectSoundObject.play();
+        else
+          soundCollection.wrongSoundObject.play();
       }
 
       resolve({
         collection: {
-          backgroundMusicObject: backgroundMusicObject,
-          hoverSoundObject: hoverSoundObject,
-          selectSoundObject: selectSoundObject
+          backgroundMusicObject,
+          hoverSoundObject,
+          selectSoundObject,
+          wrongSoundObject
         },
         musicPlayer: play
       });
