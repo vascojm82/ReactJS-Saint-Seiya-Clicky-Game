@@ -47,7 +47,7 @@ let CardBox = React.createClass({
       let list = [];
 
       imgOrderArray.forEach((index, cardNum) => {   //Had to make it an arrow func. instead of a regular one, as reference to 'this' had been
-                                                    //lost inside. It was pointing to 'cardNum' instead of the component itself so this.props was
+        console.log("cardNum: ",cardNum);           //lost inside. It was pointing to 'cardNum' instead of the component itself so this.props was
         list.push(<Card getCardState={this.getCardState} playSound={this.props.playMusic} soundCollection={this.props.soundCollection} cardNum={cardNum} />);   //showing up as 'undefined'
       });
 
