@@ -21240,7 +21240,7 @@ let App = React.createClass({
     if (hasBeenSelected) {
       console.log("Re-start! ---App.computeScore--");
       this.setState({
-        topScore: this.state.score,
+        topScore: this.state.topScore >= this.state.score ? this.state.topScore : this.state.score,
         score: 0
       }, function () {
         console.log(`score: ${this.state.score} | topScore: ${this.state.topScore}`);
@@ -21277,7 +21277,7 @@ let App = React.createClass({
       'div',
       { 'class': 'container-fluid' },
       React.createElement(Favicon, { url: './../public/img/favicon.ico' }),
-      React.createElement(Navbar, { score: this.state.score, topScore: this.state.topScore, title: 'Clicky Game', subtitle: 'Click an image to begin!', ref: 'nav' }),
+      React.createElement(Navbar, { title: 'Clicky Game', subtitle: 'Click an image to begin!', ref: 'nav' }),
       React.createElement(Hero, { title: 'Clicky Game!', subtitle: 'Click on an image to earn points, but ONLY once!' }),
       this.state.cardBox,
       this.state.modal,
