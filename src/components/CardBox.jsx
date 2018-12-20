@@ -5,7 +5,7 @@ let Json = require('circular-json');
 
 let CardBox = React.createClass({
   getInitialState: function() {
-    return { cardList: [], currentCard: '', prevCard: '' };
+    return { cardList: [], currentCard: null, prevCards: [] };
   },
   getRandomArray: function(min,max){
     var A= [];
@@ -13,45 +13,52 @@ let CardBox = React.createClass({
     A.sort(function(){return .5- Math.random()});
     return A;
   },
+  search: function(arr, target){
+    let result = arr.indexOf(target);
+    console.log("serach arr: ", arr);
+    console.log("serach result: ", result);
+
+    if(result > -1)
+      return true;
+    else
+      return false;
+  },
   getCardState: function(selectedCard){
-    if(this.state.currentCard === ''){
+    let previousCardSet = this.state.prevCards;
+
+    if(this.search(this.state.prevCards, selectedCard)){    //If the card was already selected
+      this.props.playMusic('wrongSound', this.props.soundCollection);
+      this.props.computeScore(true);    //hasBeenSelected = true, here
+      this.generateCardList()
+        .then(function(list){
+          this.setState({
+            cardList: list,
+            prevCards: []
+          });
+        }.bind(this));
+    }else{   //If the card has NOT been selected
       this.props.playMusic('selectSound', this.props.soundCollection);
-      console.log(`First Time EVER!!`);
-      this.props.computeScore(false);
-      this.setState({
-        currentCard: selectedCard,
-        prevCard: this.state.currentCard
-      });
-    }else if(this.state.currentCard >= 0){
-      if(this.state.currentCard === selectedCard || this.state.prevCard === selectedCard){
-        console.log("this.state.currentCard: ",this.state.currentCard);
-        this.props.playMusic('wrongSound', this.props.soundCollection);
-        this.props.computeScore(true);
-        this.generateCardList()
-          .then(function(list){
-            this.setState({
-              cardList: list
-            });
-          }.bind(this));
-      }else{
-        this.props.playMusic('selectSound', this.props.soundCollection);
-        this.props.computeScore(false);
-        this.setState({
-          currentCard: selectedCard,
-          prevCard: this.state.currentCard
-        });
-      }
+      this.props.computeScore(false);   //hasBeenSelected = false, here
+
+      previousCardSet.push(selectedCard);
+
+      this.generateCardList()
+        .then(function(list){
+          this.setState({
+            cardList: list,
+            currentCard: selectedCard,
+            prevCards: previousCardSet
+          });
+        }.bind(this));
     }
   },
   generateCardList: function(){
     return new Promise((resolve, reject) => {
       let imgOrderArray = this.getRandomArray(1, 48);
-      console.log("Img Array: ", imgOrderArray);
       let list = [];
-
-      imgOrderArray.forEach((cardNum, index) => {   //Had to make it an arrow func. instead of a regular one, as reference to 'this' had been
-        console.log("cardNum: ",cardNum);           //lost inside. It was pointing to 'cardNum' instead of the component itself so this.props was
-        list.push(<Card getCardState={this.getCardState} selected={false} playSound={this.props.playMusic} soundCollection={this.props.soundCollection} cardNum={cardNum} />);   //showing up as 'undefined'
+                             //Had to make it an arrow func. instead of a regular one, as reference to 'this' had been
+      imgOrderArray.forEach((cardNum, index) => {   //lost inside. It was pointing to 'cardNum' instead of the component itself so this.props was showing up as 'undefined'
+        list.push(<Card getCardState={this.getCardState} cardNum={cardNum} selected={false} playSound={this.props.playMusic} soundCollection={this.props.soundCollection} />);
       });
 
       if(list.length > 0)

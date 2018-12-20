@@ -16,7 +16,7 @@ let App = React.createClass({
   toggleModal: function(){
     $(ReactDOM.findDOMNode(this.refs.modal)).modal();
   },
-  computeScore: function(hasBeenSelected){
+  computeScore: function(hasBeenSelected){    //'hasBeenSelected' is either true or false
     if(hasBeenSelected){
       console.log("Re-start! ---App.computeScore--");
       this.setState({

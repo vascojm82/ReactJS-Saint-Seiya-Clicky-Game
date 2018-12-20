@@ -2,7 +2,6 @@ let React = require('react');
 
 let Card = React.createClass({
   onMouseOver: function(e){
-    console.log("this --- Card ---",this);
     this.props.playSound('hoverSound', this.props.soundCollection);
   },
   onClick: function(e){
