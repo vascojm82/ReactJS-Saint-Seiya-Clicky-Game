@@ -18,24 +18,17 @@ let App = React.createClass({
   },
   computeScore: function(hasBeenSelected){    //'hasBeenSelected' is either true or false
     if(hasBeenSelected){
-      console.log("Re-start! ---App.computeScore--");
       this.setState({
         topScore: (this.state.topScore >= this.state.score)? this.state.topScore : this.state.score,
         score: 0,
       }, function(){
-        console.log(`score: ${this.state.score} | topScore: ${this.state.topScore}`);
-        console.log(`this.refs.nav.state: `,this.refs.nav.state);
-        this.refs.nav.state.score = this.state.score;
-        this.refs.nav.state.topScore = this.state.topScore;
+        this.refs.nav.setScores(this.state.score, this.state.topScore);
       });
     }else{
-      console.log("Kontinue! ---App.computeScore--");
       this.setState({
         score: (this.state.score + 1),
       }, function(){
-        console.log(`score: ${this.state.score} | topScore: ${this.state.topScore}`);
-        console.log(`this.refs.nav.state: `,this.refs.nav.state);
-        this.refs.nav.state.score = this.state.score;
+        this.refs.nav.setScores(this.state.score);
       });
     }
   },
@@ -55,7 +48,7 @@ let App = React.createClass({
       <div class="container-fluid">
         <Favicon url="./../public/img/favicon.ico" />
         <Navbar title="Clicky Game" subtitle="Click an image to begin!" ref="nav"/>
-        <Hero title="Clicky Game!" subtitle="Click on an image to earn points, but ONLY once!" />
+        <Hero title="Clicky Game!" subtitle="Click on an image to earn points, but don't click on any more than once!" />
         {this.state.cardBox}
         {this.state.modal}
         <Footer />

@@ -4,7 +4,7 @@ let Card = require('./Card.jsx');
 let Json = require('circular-json');
 
 let CardBox = React.createClass({
-  getInitialState: function() {
+  getInitialState: function(){
     return { cardList: [], currentCard: null, prevCards: [] };
   },
   getRandomArray: function(min,max){

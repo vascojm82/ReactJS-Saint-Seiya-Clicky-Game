@@ -20,6 +20,10 @@
   text-decoration: none;
 }
 
+.click-here{
+  display: block;
+}
+
 .jumbo-col{
   padding: 0;
 }
@@ -42,6 +46,7 @@
   margin: auto;
   margin-top: 130px;
   background: linear-gradient( rgba(20,20,20, .7), rgba(20,20,20, .7));
+  padding: 10px;
 }
 
 /* Style the video: 100% width and height to cover the entire window */
@@ -72,6 +77,7 @@
   -ms-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
   transition: all 0.5s ease;
+  width: 100%;
 }
 
 .img-card{
@@ -116,6 +122,10 @@ footer{
 @media only screen and (max-width: 452px) {
   .navbar h3{
     font-size: 14px;
+  }
+
+  .click-here{
+    display: none;
   }
 
 }

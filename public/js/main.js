@@ -21239,24 +21239,17 @@ let App = React.createClass({
   computeScore: function (hasBeenSelected) {
     //'hasBeenSelected' is either true or false
     if (hasBeenSelected) {
-      console.log("Re-start! ---App.computeScore--");
       this.setState({
         topScore: this.state.topScore >= this.state.score ? this.state.topScore : this.state.score,
         score: 0
       }, function () {
-        console.log(`score: ${this.state.score} | topScore: ${this.state.topScore}`);
-        console.log(`this.refs.nav.state: `, this.refs.nav.state);
-        this.refs.nav.state.score = this.state.score;
-        this.refs.nav.state.topScore = this.state.topScore;
+        this.refs.nav.setScores(this.state.score, this.state.topScore);
       });
     } else {
-      console.log("Kontinue! ---App.computeScore--");
       this.setState({
         score: this.state.score + 1
       }, function () {
-        console.log(`score: ${this.state.score} | topScore: ${this.state.topScore}`);
-        console.log(`this.refs.nav.state: `, this.refs.nav.state);
-        this.refs.nav.state.score = this.state.score;
+        this.refs.nav.setScores(this.state.score);
       });
     }
   },
@@ -21279,7 +21272,7 @@ let App = React.createClass({
       { 'class': 'container-fluid' },
       React.createElement(Favicon, { url: './../public/img/favicon.ico' }),
       React.createElement(Navbar, { title: 'Clicky Game', subtitle: 'Click an image to begin!', ref: 'nav' }),
-      React.createElement(Hero, { title: 'Clicky Game!', subtitle: 'Click on an image to earn points, but ONLY once!' }),
+      React.createElement(Hero, { title: 'Clicky Game!', subtitle: 'Click on an image to earn points, but don\'t click on any more than once!' }),
       this.state.cardBox,
       this.state.modal,
       React.createElement(Footer, null)
@@ -21305,7 +21298,7 @@ let Card = React.createClass({
     let img = `img/${this.props.cardNum}.png`;
     return React.createElement(
       'div',
-      { className: 'col-md-3' },
+      { className: 'col-xs-8 col-xs-offset-2 col-sm-3 col-sm-offset-2 col-md-3 col-md-offset-0' },
       React.createElement(
         'div',
         { id: this.props.cardNum, className: 'card character hvr-bounce-in', onMouseEnter: this.onMouseOver, onClick: this.onClick },
@@ -21442,9 +21435,13 @@ let Hero = React.createClass({
   displayName: "Hero",
 
   render: function () {
+    let heroContainerStyle = {
+      paddingRight: 0
+    };
+
     return React.createElement(
       "div",
-      { className: "container-fluid" },
+      { style: heroContainerStyle, className: "container-fluid" },
       React.createElement(
         "div",
         { className: "row" },
@@ -21572,6 +21569,12 @@ let Navbar = React.createClass({
     //called only once when the component loads
     return { score: 0, topScore: 0 };
   },
+  setScores: function (score, topScore = this.state.topScore) {
+    this.setState({
+      score: score,
+      topScore: topScore
+    });
+  },
   render: function () {
     return React.createElement(
       "nav",
@@ -21584,7 +21587,7 @@ let Navbar = React.createClass({
           { className: "row" },
           React.createElement(
             "div",
-            { className: "col-xs-3 col-sm-4 col-md-4" },
+            { className: "col-xs-3 col-sm-4 col-md-4 click-here" },
             React.createElement(
               "a",
               { href: "#" },
@@ -21597,7 +21600,7 @@ let Navbar = React.createClass({
           ),
           React.createElement(
             "div",
-            { className: "col-xs-5 col-sm-4 col-md-4" },
+            { className: "col-xs-5 col-sm-4 col-md-4 click-here" },
             React.createElement(
               "h3",
               { className: "text-center" },

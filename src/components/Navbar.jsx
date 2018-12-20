@@ -4,15 +4,21 @@ let Navbar = React.createClass({
   getInitialState: function(){     //called only once when the component loads
     return {score: 0, topScore: 0};
   },
+  setScores: function(score, topScore = this.state.topScore){
+    this.setState({
+      score: score,
+      topScore: topScore
+    });
+  },
   render: function(){
     return(
       <nav className="navbar navbar-default">
         <div className="container-fluid">
           <div className="row">
-            <div className="col-xs-3 col-sm-4 col-md-4">
+            <div className="col-xs-3 col-sm-4 col-md-4 click-here">
               <a href="#"><h3 class="text-center">{this.props.title}</h3></a>
             </div>
-            <div className="col-xs-5 col-sm-4 col-md-4">
+            <div className="col-xs-5 col-sm-4 col-md-4 click-here">
               <h3 className="text-center">{this.props.subtitle}</h3>
             </div>
             <div className="col-xs-4 col-sm-4 col-md-4">

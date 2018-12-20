@@ -2,8 +2,12 @@ let React = require('react');
 
 let Hero = React.createClass({
   render: function(){
+    let heroContainerStyle = {
+      paddingRight: 0
+    }
+
     return(
-      <div className="container-fluid">
+      <div style={heroContainerStyle} className="container-fluid">
         <div className="row">
           <div className="col-md-12 jumbo-col">
             <div className="jumbotron">
